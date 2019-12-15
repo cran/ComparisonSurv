@@ -1,0 +1,16 @@
+f3059d7649334e1fe5043e3f80c0ac8b *DESCRIPTION
+83ae1ac68cc6b811b56b787ff49b23b9 *NAMESPACE
+0cd76c780b6cd7a6d62db1fb2cc66006 *R/ComparisonSurv.R
+4d065a2c5d93e3d372ff2cd0f80f7aac *data/Crossdata.rda
+5af111de462ea9801a13887323523176 *data/PHdata.rda
+776688cf65be3c7c17b8856add44211e *man/Crossdata.Rd
+86938dd9923c32b527bffef797ef4b82 *man/Cumhazard.plot.Rd
+87d10b97c5c46785f4a0e97a3f107f69 *man/Descriptive.stat.Rd
+330d17d2ba6c1d89a1852cbbf5cb01b4 *man/Fixpoint.test.Rd
+0d15afe891d43da8c281e81953431c08 *man/Hazard.plot.Rd
+80e0ab8f0c6d9bf11cb51fb8c4d1595c *man/Long.test.Rd
+fcf95a27383faf4a5aff8925a802a2c1 *man/Overall.test.Rd
+2301b386a29750d8686c7fd8543bc825 *man/PHdata.Rd
+73a4341b7e17bcf70e175f14130904c4 *man/Short.test.Rd
+3db6d4a5fa8c0dfd1e87271fdae65829 *man/Survival.plot.Rd
+5ecaeb738be27741bb958b84d229e417 *man/crosspoint.Rd
