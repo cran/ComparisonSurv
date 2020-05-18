@@ -28,6 +28,7 @@ A list containing the following components:
 }
 \references{
 [1]Klein JP, Logan B, Harhoff M, et al. Analyzing survival curves at a fixed point in time. Statistics in Medicine, 2007, 26(24):4505-4519.
+
 [2]Anderson JR, Pike LBC. Approximate Confidence Intervals for Probabilities of Survival and Quantiles in Life-Table Analysis. Biometrics, 1982, 38(2):407-416.
 }
 \examples{

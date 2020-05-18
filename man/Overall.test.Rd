@@ -28,8 +28,10 @@ The results of RMST is based on the "survRM2" package, more details can be found
 }
 \references{
 [1] Li H, Han D, Hou Y, et al. Statistical inference methods for two crossing survival curves: a comparison of methods. PLoS One, 2015, 10: e116774.
+
 [2] Qiu P, Sheng J. A two-stage procedure for comparing hazard rate functions. Journal of the Royal Statistical Society. Series B, Statistical Methodology, 2008, 70: 191-208.
-[3] Huang X, Lyu J, Hou Y, Chen Z. A Nonparametric Statistical Method for Two Crossing Survival Curves. 2019. Under Review.
+
+[3] Huang X, Lyu J, Hou Y, et al. A Nonparametric Statistical Method for Two Crossing Survival Curves. 2020. doi: 10.1080/03610918.2020.1753075.
 }
 \examples{
 #get 'Crossdata' from package

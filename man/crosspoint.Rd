@@ -24,7 +24,7 @@ The crosspoint function only used to find the cross time point in survival curve
 data(Crossdata)
 data1<-Crossdata
 #get cross point
-#two survival curves crossing at 1.72832 years
+#two survival curves crossing at 1.69 years or so
 crosspoint(data1$time,data1$status,data1$group)
 #
 #get 'PHdata' from package

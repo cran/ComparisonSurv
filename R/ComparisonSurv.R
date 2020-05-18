@@ -389,7 +389,7 @@ Overall.test<-function(time,status,group,tau=NULL,nperm=500,seed=12345){
   rmst_p<-rm$unadjusted.result[1,4]
   tau<-rm$tau
 
-  message("\n PH assumption yield a result of: Pvalue =", round(ph_p,5), "chisq =", round(ph_s,5),".\n")
+  message("\n PH assumption yield a result of: Pvalue =", round(ph_p,5), ", chisq =", round(ph_s,5),".\n")
 
   result<-data.frame(method=c("Log-rank","Gehan-Wilcoxon","Tarone-Ware","Weighted KM"
                               ,"ABS","ABS permutation","Two-stage","Squared differences",paste("RMST (tau=",tau,")")),
@@ -688,7 +688,7 @@ Long.test<-function(time,status,group,t0){
 cross<-function(time,status,group){
   dataset<-data.frame(time,status,group)
   all<-survfit(Surv(time,status)~group)
-  #  plot(all)
+
   crosspoint<-c()
   df1<-survfit(Surv(time,status)~1,data=dataset[dataset$group==0,])
   df2<-survfit(Surv(time,status)~1,data=dataset[dataset$group==1,])
@@ -706,14 +706,14 @@ cross<-function(time,status,group){
     if(is.na(tds$s2t[i])) tds$s2t[i]<-tds$s2t[i-1]
   }
 
-  #Attention!not only the first row of s1t and s2t,if(is.na(tds$s1t))
+
   tds$s1t[is.na(tds$s1t)]<-1
   tds$s2t[is.na(tds$s2t)]<-1
   d<-tds$s1t-tds$s2t
   tds<-cbind(tds,d)
-  #tds<-tds[order(tds[,4]),]
+
   for (i in 2:nrow(tds)){
-    dd[i]<-tds$d[i]*tds$d[i-1] #
+    dd[i]<-tds$d[i]*tds$d[i-1]
   }
   if (tds$s1t[1]==tds$s2t[1]) dd[1]<-0 else dd[1]<-2
   tds<-cbind(tds,dd)
@@ -744,7 +744,7 @@ crosspoint<-function(time,status,group){
     cross(time,status,group)
   }
   else if (num>=2) {
-    message("\n There are", num,"crossings exist. \n The exat crossing time points are as follows:\n")
+    message("\n There are ", num," crossings exist. \n The exat crossing time points are as follows:\n")
     cross(time,status,group)
   }
 }
@@ -830,7 +830,7 @@ p1<-p2<-1
 b1=3
 b2=3
 n1<-n2<-100
-set.seed(1000000*1+1000*n1)           #group1:nocen
+set.seed(1000000*1+1000*n1)
 obs.time1<-rexp(n1,1)
 obs.status1<-rbinom(n1,size=1,prob=p1)
 obs.status1<-ifelse(obs.status1==0,2,1)
@@ -841,7 +841,7 @@ group1<-rep(1,n1)
 cen.rate1<-length(status1[status1==0])/n1
 cause.rate1<-length(status1[status1==1])/n1
 
-set.seed(1000000*2+1000*n2)           #group2:nocen
+set.seed(1000000*2+1000*n2)
 obs.time2<-rexp(n2,exp(0.8))
 p2<-1-(1-p1)^exp(0.8)
 obs.status2<-rbinom(n2,size=1,prob=p2)
@@ -855,7 +855,7 @@ cause.rate2<-length(status2[status2==1])/n2
 
 
 
-time<-c(time1,time2)                                 #final data
+time<-c(time1,time2)
 status<-c(status1,status2)
 group<-c(group1,group2)-1
 PHdata<-data.frame(time,status,group)
