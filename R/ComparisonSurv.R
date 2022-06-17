@@ -2,7 +2,7 @@
 ##################################################################
 ######      Descriptive statistic for time-to-event data    ######
 ##################################################################
-Descrip.method<-function(time,status,group,tau=NULL,alpha=0.05){
+Descrip.method<-function(time,status,group,tau="observed",alpha=0.05){
   index0<-which(group==0)
   index1<-which(group==1)
   group0.samplesize<-length(index0)
@@ -13,6 +13,8 @@ Descrip.method<-function(time,status,group,tau=NULL,alpha=0.05){
   group1.censore.rate<-1-sum(status[index1])/group1.samplesize
   group0.max.event.time<-max(time[index0][which(status[index0]==1)])
   group1.max.event.time<-max(time[index1][which(status[index1]==1)])
+  group0.max.time<-max(time[index0])
+  group1.max.time<-max(time[index1])
 
   kmfit<-survfit(Surv(time,status==1)~group)
   s<-summary(kmfit,alpha=alpha)
@@ -26,6 +28,7 @@ Descrip.method<-function(time,status,group,tau=NULL,alpha=0.05){
   group1.mean.lower95<-group1.mean.time-qnorm(1-alpha/2)*sqrt(su[2,6])
   group1.mean.upper95<-group1.mean.time+qnorm(1-alpha/2)*sqrt(su[2,6])
 
+  sq<-quantile(kmfit)
   group0.median.time<-su[1,7]
   group0.median.lower95<-su[1,8]
   group0.median.upper95<-su[1,9]
@@ -33,12 +36,33 @@ Descrip.method<-function(time,status,group,tau=NULL,alpha=0.05){
   group1.median.lower95<-su[2,8]
   group1.median.upper95<-su[2,9]
 
+  group0.time.25<-sq$quantile[,"25"][1]
+  group0.time.25.lower95<- sq$lower[,"25"][1]
+  group0.time.25.upper95<- sq$upper[,"25"][1]
+  group1.time.25<-sq$quantile[,"25"][2]
+  group1.time.25.lower95<- sq$lower[,"25"][2]
+  group1.time.25.upper95<- sq$upper[,"25"][2]
+
+  group0.time.75<-sq$quantile[,"75"][1]
+  group0.time.75.lower95<- sq$lower[,"75"][1]
+  group0.time.75.upper95<- sq$upper[,"75"][1]
+  group1.time.75<-sq$quantile[,"75"][2]
+  group1.time.75.lower95<- sq$lower[,"75"][2]
+  group1.time.75.upper95<- sq$upper[,"75"][2]
+
   strata<-s$strata
 
-  if(is.null(tau)==TRUE){
+  if(tau=="observed"){
+    tau=min(group0.max.time,group1.max.time)
+  }
+
+  if(tau=="event"){
     tau=min(group0.max.event.time,group1.max.event.time)
   }
+
   tau1<-tau
+  if(tau1>max(group0.max.time,group1.max.time)) stop("tau is larger than the maximum of observed time in both of the two groups")
+
   rm<-rmst2(time,status,arm=group,tau1,alpha=alpha)
   #  plot(rm)
   group0.RMST<-rm$RMST.arm0$rmst[[1]]
@@ -54,6 +78,7 @@ Descrip.method<-function(time,status,group,tau=NULL,alpha=0.05){
   Y$result.summary=data.frame(sample.size=c(group0.samplesize,group1.samplesize),
                               event.num=c(group0.event.size,group1.event.size),
                               censoring.rate=c(group0.censore.rate,group1.censore.rate),
+                              max.observed.time=c(group0.max.time,group1.max.time),
                               max.event.time=c(group0.max.event.time,group1.max.event.time))
   rownames(Y$result.summary)<-c("group=0","group=1")
 
@@ -65,12 +90,22 @@ Descrip.method<-function(time,status,group,tau=NULL,alpha=0.05){
   colnames(Y$result.mean)<-c("Est.","se",paste("lower .", round((1 -  alpha) * 100, digits = 0), sep = ""),
                              paste("upper .",round((1 - alpha) * 100, digits = 0), sep = ""))
 
-  Y$result.median=data.frame( median.time=c(group0.median.time,group1.median.time),
-                              median.lower95=c(group0.median.lower95,group1.median.lower95),
-                              median.upper95=c(group0.median.upper95,group1.median.upper95))
-  rownames(Y$result.median)<-c("group=0","group=1")
-  colnames(Y$result.median)<-c("Est.",paste("lower .", round((1 -  alpha) * 100, digits = 0), sep = ""),
-                               paste("upper .",round((1 - alpha) * 100, digits = 0), sep = ""))
+  Y$result.quantile=data.frame(time.25=c(group0.time.25,group1.time.25),
+                               time.25.lower95=c(group0.time.25.lower95,group1.time.25.lower95),
+                               time.25.upper95=c(group0.time.25.upper95,group1.time.25.upper95),
+                               median.time=c(group0.median.time,group1.median.time),
+                               median.lower95=c(group0.median.lower95,group1.median.lower95),
+                               median.upper95=c(group0.median.upper95,group1.median.upper95),
+                               time.75.time=c(group0.time.75,group1.time.75),
+                               time.75.lower95=c(group0.time.75.lower95,group1.time.75.lower95),
+                               time.75.upper95=c(group0.time.75.upper95,group1.time.75.upper95))
+  rownames(Y$result.quantile)<-c("group=0","group=1")
+  colnames(Y$result.quantile)<-c("Est.25",paste("lower .", round((1 -  alpha) * 100, digits = 0), sep = ""),
+                                 paste("upper .",round((1 - alpha) * 100, digits = 0), sep = ""),
+                                 "Est.50",paste("lower .", round((1 -  alpha) * 100, digits = 0), sep = ""),
+                                 paste("upper .",round((1 - alpha) * 100, digits = 0), sep = ""),
+                                 "Est.75",paste("lower .", round((1 -  alpha) * 100, digits = 0), sep = ""),
+                                 paste("upper .",round((1 - alpha) * 100, digits = 0), sep = ""))
 
   Y$tau<-tau1
   Y$result.RMST=data.frame(   RMST=c(group0.RMST,group1.RMST),
@@ -84,7 +119,7 @@ Descrip.method<-function(time,status,group,tau=NULL,alpha=0.05){
   Y
 }
 
-Descriptive.stat<-function(time,status,group,tau=NULL,alpha=0.05){
+Descriptive.stat<-function(time,status,group,tau="observed",alpha=0.05){
 
   if (all(status%in%c(0,1))==FALSE) stop("Status must be 0 or 1")
   if (length(unique(group))!=2) stop("There must be two groups")
@@ -330,8 +365,8 @@ Overall.test<-function(time,status,group,tau=NULL,nperm=500,seed=12345){
   #PH
   fit <- coxph(Surv(time,status==1)~group)
   temp<- cox.zph(fit)
-  ph_s<-temp$table[2]
-  ph_p<-temp$table[3]
+  ph_s<-temp$table["GLOBAL","chisq"]
+  ph_p<-temp$table["GLOBAL","p"]
 
   #twostage
   twostage<-twostage(time,status,group,nperm) #twostage sample size 1000
@@ -464,28 +499,28 @@ Fixpoint<-function(time,status,group,t0){
   ci54<-L2*surv2/((L2-1)*surv2+1)
   result<-list()
   result$est.g0<-data.frame(method=c("Naive","Log","Cloglog","Arcsin-square","Logit"),
-                   t0=rep(t0,5),
-                   est=rep(surv1,5),
-                   "lower 95 CI"=c(ci11,ci21,ci31,ci41,ci51),
-                   "upper 95 CI"=c(ci12,ci22,ci32,ci42,ci52))
+                            t0=rep(t0,5),
+                            est=rep(surv1,5),
+                            "lower 95 CI"=c(ci11,ci21,ci31,ci41,ci51),
+                            "upper 95 CI"=c(ci12,ci22,ci32,ci42,ci52))
   result$est.g1<-data.frame(method=c("Naive","Log","Cloglog","Arcsin-square","Logit"),
-                   t0=rep(t0,5),
-                   est=rep(surv2,5),
-                   "lower 95 CI"=c(ci13,ci23,ci33,ci43,ci53),
-                   "upper 95 CI"=c(ci14,ci24,ci34,ci44,ci54))
+                            t0=rep(t0,5),
+                            est=rep(surv2,5),
+                            "lower 95 CI"=c(ci13,ci23,ci33,ci43,ci53),
+                            "upper 95 CI"=c(ci14,ci24,ci34,ci44,ci54))
   result$test<-data.frame(method=c("Naive","Log","Cloglog","Arcsin-square","Logit"),
-                     statistic=c(round(X2,5),round(X1,5),round(X3,5),round(X4,5),round(X5,5)),
-                     pvalue=c(round(pX2,5),round(pX1,5),round(pX3,5),round(pX4,5),round(pX5,5)))
+                          statistic=c(round(X2,5),round(X1,5),round(X3,5),round(X4,5),round(X5,5)),
+                          pvalue=c(round(pX2,5),round(pX1,5),round(pX3,5),round(pX4,5),round(pX5,5)))
   print(result)
-  }
+}
 
 Fixpoint.test<-function(time,status,group,t0){
 
   if (all(status%in%c(0,1))==FALSE) stop("Status must be 0 or 1")
   if (length(unique(group))<2) stop("There must be two or more groups")
   if(is.na(t0)==TRUE) stop("t0 is null,please select a time point")
-  if(t0<=min(time)) stop("t0 is too small,please select a time point more than the minimum non-censored timepoint")
-  if(t0>=max(time)) stop("t0 is too large,please select a time point less than the maximum non-censored timepoint")
+  if(t0<=min(time[which(status==1)])) stop("t0 is too small,please select a time point more than the minimum non-censored timepoint")
+  if(t0>=max(time[which(status==1)])) stop("t0 is too large,please select a time point less than the maximum non-censored timepoint")
   if (all(group%in%c(0,1))==FALSE)  stop("Group must be 0 or 1")
 
   Fixpoint(time,status,group,t0)
@@ -569,8 +604,8 @@ Short.test<-function(time,status,group,t0){
   if (all(status%in%c(0,1))==FALSE) stop("Status must be 0 or 1")
   if (length(unique(group))!=2) stop("There must be two groups")
   if (all(group%in%c(0,1))==FALSE)  stop("Group must be 0 or 1")
-  if(t0<=min(time)) stop("t0 is too small,please select a time point more than the minimum non-censored timepoint")
-  if(t0>=max(time)) stop("t0 is too large,please select a time point less than the maximum of time")
+  if(t0<=min(time[which(status==1)])) stop("t0 is too small,please select a time point more than the minimum non-censored timepoint")
+  if(t0>=max(time[which(status==1)])) stop("t0 is too large,please select a time point less than the maximum of time")
 
   Short(time,status,group,t0)
 }
@@ -675,8 +710,8 @@ Long.test<-function(time,status,group,t0){
   if (length(unique(group))!=2) stop("There must be two groups")
   if (all(group%in%c(0,1))==FALSE)  stop("Group must be 0 or 1")
   if(is.na(t0)==TRUE) stop("t0 is null,please select a time point")
-  if(t0>=max(time)) stop("t0 is too large,please select a time point less than the maximum of non-censored time")
-  if(t0<=min(time)) stop("t0 is too small,please select a time point larger than the minimum of non-censored time")
+  if(t0>=max(time[which(status==1)])) stop("t0 is too large,please select a time point less than the maximum of non-censored time")
+  if(t0<=min(time[which(status==1)])) stop("t0 is too small,please select a time point larger than the minimum of non-censored time")
 
   Long(time,status,group,t0)
 }
@@ -724,9 +759,10 @@ cross<-function(time,status,group){
       crosspoint<-rbind(crosspoint,crosspoint1)
     }
   }
-  if (length(crosspoint)==0) stop ("There is no crossing exists.")
-  rownames(crosspoint)<-seq(1:length(crosspoint))
-  result<-data.frame(crosspoint)
+  if (length(crosspoint)==0){
+    result=data.frame(crosspoint=NA)} else{
+      rownames(crosspoint)<-seq(1:length(crosspoint))
+      result<-data.frame(crosspoint)}
   result
 }
 
@@ -737,16 +773,18 @@ crosspoint<-function(time,status,group){
   if (length(unique(group))!=2) stop("There must be two groups")
   if (all(group%in%c(0,1))==FALSE)  stop("Group must be 0 or 1")
 
-  num<-length(cross(time,status,group)$crosspoint)
+  num<-cross(time,status,group)$crosspoint
 
-  if (num==1) {
-    message("\n There is only one crossing exists. \n The exat crossing time point is as follow:\n")
-    cross(time,status,group)
-  }
-  else if (num>=2) {
-    message("\n There are ", num," crossings exist. \n The exat crossing time points are as follows:\n")
-    cross(time,status,group)
-  }
+  if(sum(is.na(num))) {message("There is no crossing exists.")} else{
+    if (length(num)==1) {
+      message("\n There is only one crossing exists. \n The exat crossing time point is as follow:\n")
+      cross(time,status,group)
+    }
+
+    if (length(num)>=2) {
+      message("\n There are ", length(num)," crossings exist. \n The exat crossing time points are as follows:\n")
+      cross(time,status,group)
+    }}
 }
 
 
@@ -754,14 +792,12 @@ crosspoint<-function(time,status,group){
 ######            Survival rate plot figure       ######
 ########################################################
 
-Survival.plot<-function(time,status,group,col=c(1,4),lwd=c(1,1),lty=c(1,1),lab.x="",lab.y="",legend=FALSE,local.x=NULL,local.y=NULL,legend.0="",legend.1=""){
+Survival.plot<-function(time,status,group,...){
   if (all(status%in%c(0,1))==FALSE) stop("Status must be 0 or 1")
   if (length(unique(group))!=2) stop("There must be two groups")
   if (all(group%in%c(0,1))==FALSE)  stop("Group must be 0 or 1")
   kmfit<-survfit(Surv(time,status==1)~group)
-
-  plot(kmfit,col=col,lwd=lwd,lty=lty,xlab=lab.x,ylab=lab.y,cex.lab=1.5,cex.axis=1.5,mark.time=FALSE)
-  if (legend==1) {legend(local.x,local.y,c(legend.0,legend.1),col=col,lwd=lwd,lty=lty,cex=1.5)}
+  plot(kmfit,...)
 }
 
 ########################################################
@@ -824,7 +860,6 @@ Hazard.plot<-function(time,status,group,max.0=NULL,max.1=NULL,col=c(1,4),lwd=c(1
   lines(fit1,lwd=lwd[2],lty=lty[2],col=col[2])
   if (legend==1) {legend(local.x,local.y,c(legend.0,legend.1), col=col,lwd=lwd,cex=1.5)}
 }
-
 
 p1<-p2<-1
 b1=3

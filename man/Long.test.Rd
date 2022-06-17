@@ -36,8 +36,8 @@ data1<-Crossdata
 #
 #get cross point
 crosspoint(data1$time,data1$status,data1$group)
-#two survival curves crossing at 1.72832 years
+#two survival curves crossing at 1.69 years
 #
-#get the result after cross point (t0=1.73)
-Long.test(data1$time,data1$status,data1$group,t0=1.73)
+#get the result after cross point (t0=1.69)
+Long.test(data1$time,data1$status,data1$group,t0=1.69)
 }
