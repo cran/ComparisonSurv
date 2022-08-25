@@ -509,8 +509,8 @@ Fixpoint<-function(time,status,group,t0){
                             "lower 95 CI"=c(ci13,ci23,ci33,ci43,ci53),
                             "upper 95 CI"=c(ci14,ci24,ci34,ci44,ci54))
   result$test<-data.frame(method=c("Naive","Log","Cloglog","Arcsin-square","Logit"),
-                          statistic=c(round(X2,5),round(X1,5),round(X3,5),round(X4,5),round(X5,5)),
-                          pvalue=c(round(pX2,5),round(pX1,5),round(pX3,5),round(pX4,5),round(pX5,5)))
+                          statistic=c(round(X1,5),round(X2,5),round(X3,5),round(X4,5),round(X5,5)),
+                          pvalue=c(round(pX1,5),round(pX2,5),round(pX3,5),round(pX4,5),round(pX5,5)))
   print(result)
 }
 

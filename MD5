@@ -1,6 +1,6 @@
-ebd75e03b41f28dc6a36709611d225ce *DESCRIPTION
+2283c2966854af2cb4199c096d4c4dfb *DESCRIPTION
 83ae1ac68cc6b811b56b787ff49b23b9 *NAMESPACE
-b62d1dd446f4419944c44f641c3ade9a *R/ComparisonSurv.R
+4cf734816f01953f33f43302a58e7ef7 *R/ComparisonSurv.R
 5783d10c72e20be3dae6bf6c3011ad60 *data/Crossdata.rda
 18552017b53e455bce2939e8a72b1324 *data/PHdata.rda
 dd43bcd0dc33245dcfdb274837f49457 *man/ComparisonSurv-package.Rd
